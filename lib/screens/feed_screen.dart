@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:socializz/utils/colors.dart';
@@ -28,7 +29,23 @@ class FeedScreen extends StatelessWidget {
               ))
         ],
       ),
-      body: const MemoryCard(),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance.collection('memories').snapshots(),
+        builder: (context,
+            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) => MemoryCard(
+              snap: snapshot.data!.docs[index].data(),
+            ),
+          );
+        },
+      ),
     );
   }
 }

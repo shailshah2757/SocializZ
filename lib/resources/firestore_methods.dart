@@ -35,4 +35,24 @@ class FirestoreMethods {
     }
     return res;
   }
+
+  Future<void> likeMemory(String memoryId, String uid, List likes) async {
+    try {
+      if (likes.contains(uid)) {
+        await _firestore.collection('memories').doc(memoryId).update(
+          {
+            'likes': FieldValue.arrayRemove([uid]),
+          },
+        );
+      } else {
+        await _firestore.collection('memories').doc(memoryId).update({
+          'likes': FieldValue.arrayUnion([uid]),
+        });
+      }
+    } catch (e) {
+      print(
+        e.toString(),
+      );
+    }
+  }
 }

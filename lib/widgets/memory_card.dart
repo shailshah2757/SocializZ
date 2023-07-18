@@ -1,12 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:socializz/providers/user_provider.dart';
+import 'package:socializz/resources/firestore_methods.dart';
 import 'package:socializz/utils/colors.dart';
+import 'package:socializz/widgets/like_animation.dart';
 
-class MemoryCard extends StatelessWidget {
-  const MemoryCard({super.key});
+import '../models/user.dart';
+
+class MemoryCard extends StatefulWidget {
+  final snap;
+  const MemoryCard({
+    super.key,
+    required this.snap,
+  });
+
+  @override
+  State<MemoryCard> createState() => _MemoryCardState();
+}
+
+class _MemoryCardState extends State<MemoryCard> {
+  bool isLikeAnimating = false;
 
   @override
   Widget build(BuildContext context) {
+    final User user = Provider.of<UserProvider>(context).getUser;
     return Container(
       color: mobileBackgroundColor,
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -22,7 +41,7 @@ class MemoryCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 16,
                   backgroundImage: NetworkImage(
-                    "https://images.unsplash.com/photo-1616715076659-f8915173aa00?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dW5zcGxhc2glMjBhcHB8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+                    widget.snap['profileImage'],
                   ),
                 ),
                 Expanded(
@@ -33,7 +52,7 @@ class MemoryCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "username",
+                          widget.snap['username'],
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -69,21 +88,61 @@ class MemoryCard extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.35,
-            width: double.infinity,
-            child: Image.network(
-              "https://images.unsplash.com/photo-1616715076865-1f6f05988ff2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dW5zcGxhc2glMjBhcHB8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
-              fit: BoxFit.cover,
-            ),
+          GestureDetector(
+            onDoubleTap: () async {
+              await FirestoreMethods().likeMemory(
+                  widget.snap['memoryId'], user.uid, widget.snap['likes']);
+              setState(() {
+                isLikeAnimating = true;
+              });
+            },
+            child: Stack(alignment: Alignment.center, children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.35,
+                width: double.infinity,
+                child: Image.network(
+                  widget.snap['memoryUrl'],
+                  fit: BoxFit.cover,
+                ),
+              ),
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: isLikeAnimating ? 1 : 0,
+                child: LikeAnimation(
+                  isAnimating: isLikeAnimating,
+                  duration: const Duration(
+                    milliseconds: 400,
+                  ),
+                  onEnd: () {
+                    setState(() {
+                      isLikeAnimating = false;
+                    });
+                  },
+                  child: const Icon(
+                    Icons.favorite,
+                    color: Colors.white,
+                    size: 120,
+                  ),
+                ),
+              )
+            ]),
           ),
           Row(
             children: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  LineAwesomeIcons.heart_1,
-                  color: Colors.red,
+              LikeAnimation(
+                isAnimating: widget.snap['likes'].contains(user.uid),
+                smallLike: true,
+                child: IconButton(
+                  onPressed: () async {
+                    await FirestoreMethods().likeMemory(widget.snap['memoryId'],
+                        user.uid, widget.snap['likes']);
+                  },
+                  icon: widget.snap['likes'].contains(user.uid)
+                      ? const Icon(
+                          LineAwesomeIcons.heart_1,
+                          color: Colors.red,
+                        )
+                      : const Icon(Icons.favorite_outline),
                 ),
               ),
               IconButton(
@@ -121,7 +180,7 @@ class MemoryCard extends StatelessWidget {
                       .bodyMedium!
                       .copyWith(fontWeight: FontWeight.w800),
                   child: Text(
-                    "3476 likes",
+                    '${widget.snap['likes'].length} likes',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
@@ -129,17 +188,17 @@ class MemoryCard extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.only(top: 8),
                   child: RichText(
-                    text: const TextSpan(
-                        style: TextStyle(color: primaryColor),
+                    text: TextSpan(
+                        style: const TextStyle(color: primaryColor),
                         children: [
                           TextSpan(
-                            text: "username",
-                            style: TextStyle(
+                            text: widget.snap['username'],
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           TextSpan(
-                            text: "   this is description",
+                            text: ' ${widget.snap['description']}',
                           ),
                         ]),
                   ),
@@ -148,17 +207,18 @@ class MemoryCard extends StatelessWidget {
                   onTap: () {},
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Text(
+                    child: const Text(
                       "View all 50 comments",
-                      style:
-                          const TextStyle(fontSize: 16, color: secondaryColor),
+                      style: TextStyle(fontSize: 16, color: secondaryColor),
                     ),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Text(
-                    "27/02/22",
+                    DateFormat.yMMMEd().format(
+                      widget.snap['datePublished'].toDate(),
+                    ),
                     style: const TextStyle(fontSize: 16, color: secondaryColor),
                   ),
                 ),
