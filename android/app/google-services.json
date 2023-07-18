@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "260518214604",
+    "project_id": "socializz-2772",
+    "storage_bucket": "socializz-2772.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:260518214604:android:a6793ba460ceadce4a7b69",
+        "android_client_info": {
+          "package_name": "com.example.socializz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "260518214604-lkqlp6826skf1qtompcvdse1nkni00rg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_QxMPuJKBc2eG5btbAYXar7QhDGXi-RU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "260518214604-lkqlp6826skf1qtompcvdse1nkni00rg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "260518214604-kkhmd7k74a3egiakg2768og1tjpi5lmi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.socializz.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

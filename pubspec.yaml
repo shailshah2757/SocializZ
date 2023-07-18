@@ -1,0 +1,53 @@
+name: socializz
+description: A new Flutter project.
+
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.6 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  firebase_core: ^2.15.0
+  cloud_firestore: ^4.8.3
+  firebase_auth: ^4.7.0
+  firebase_storage: ^11.2.5 
+  line_awesome_flutter: ^2.0.0
+  image_picker: ^1.0.1
+  provider: ^6.0.5
+  uuid: ^3.0.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+
+flutter:
+
+  uses-material-design: true
+  fonts:
+    - family: 'Poppins'
+      fonts:
+        - asset: "assets/fonts/Poppins-Black.ttf"
+        - asset: "assets/fonts/Poppins-Light.ttf"
+        - asset: "assets/fonts/Poppins-Regular.ttf"
+        - asset: "assets/fonts/Poppins-Thin.ttf"
+        
+    - family: 'Noto Serif'
+      fonts:
+        - asset: 'assets/fonts/NotoSerif-Italic-VariableFont_wdth,wght.ttf'
+        - asset: 'assets/fonts/NotoSerif-VariableFont_wdth,wght.ttf'
+        - asset: 'assets/fonts/NotoSerif_Condensed-Bold.ttf'
+
+  assets:
+    - "assets/images/my_profile_pic.jpg"
+    - "assets/images/register_bg.png"
+    - "assets/images/login_bg.png"
+    - "assets/images/default_profile_pic.jpeg"
+

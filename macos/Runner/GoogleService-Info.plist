@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>260518214604-kkhmd7k74a3egiakg2768og1tjpi5lmi.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.260518214604-kkhmd7k74a3egiakg2768og1tjpi5lmi</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBqdB3X16Puy-KlLARYBcRIEXj5mzhMDvU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>260518214604</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.socializz.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>socializz-2772</string>
+	<key>STORAGE_BUCKET</key>
+	<string>socializz-2772.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:260518214604:ios:b6fb686c4846d6094a7b69</string>
+</dict>
+</plist>
