@@ -4,6 +4,7 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:socializz/providers/user_provider.dart';
 import 'package:socializz/resources/firestore_methods.dart';
+import 'package:socializz/screens/comments_screen.dart';
 import 'package:socializz/utils/colors.dart';
 import 'package:socializz/widgets/like_animation.dart';
 
@@ -140,13 +141,17 @@ class _MemoryCardState extends State<MemoryCard> {
                   icon: widget.snap['likes'].contains(user.uid)
                       ? const Icon(
                           LineAwesomeIcons.heart_1,
-                          color: Colors.red,
+                          color: Colors.blue,
                         )
                       : const Icon(Icons.favorite_outline),
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => CommentsScreen(),
+                  ),
+                ),
                 icon: const Icon(
                   LineAwesomeIcons.comment_dots_1,
                 ),
