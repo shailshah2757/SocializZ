@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:socializz/utils/colors.dart';
+import 'package:socializz/widgets/memory_card.dart';
 
 class FeedScreen extends StatelessWidget {
   const FeedScreen({super.key});
@@ -27,6 +28,7 @@ class FeedScreen extends StatelessWidget {
               ))
         ],
       ),
+      body: const MemoryCard(),
     );
   }
 }
