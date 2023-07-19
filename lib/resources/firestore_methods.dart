@@ -55,4 +55,42 @@ class FirestoreMethods {
       );
     }
   }
+
+  Future<void> addComment(String memoryId, String text, String uid, String name,
+      String profilePic) async {
+    try {
+      if (text.isNotEmpty) {
+        String commentId = const Uuid().v1();
+        await _firestore
+            .collection('memories')
+            .doc(memoryId)
+            .collection('comments')
+            .doc(commentId)
+            .set({
+          'profilePic': profilePic,
+          'name': name,
+          'uid': uid,
+          'text': text,
+          'commentId': commentId,
+          'datePublished': DateTime.now(),
+        });
+      } else {
+        print('Text is empty');
+      }
+    } catch (e) {
+      print(
+        e.toString(),
+      );
+    }
+  }
+
+  Future<void> deleteMemory(String memoryId) async {
+    try {
+      await _firestore.collection('memories').doc(memoryId).delete();
+    } catch (e) {
+      print(
+        e.toString(),
+      );
+    }
+  }
 }

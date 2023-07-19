@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
@@ -6,6 +7,7 @@ import 'package:socializz/providers/user_provider.dart';
 import 'package:socializz/resources/firestore_methods.dart';
 import 'package:socializz/screens/comments_screen.dart';
 import 'package:socializz/utils/colors.dart';
+import 'package:socializz/utils/utils.dart';
 import 'package:socializz/widgets/like_animation.dart';
 
 import '../models/user.dart';
@@ -23,6 +25,29 @@ class MemoryCard extends StatefulWidget {
 
 class _MemoryCardState extends State<MemoryCard> {
   bool isLikeAnimating = false;
+  int commentLength = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getComments();
+  }
+
+  void getComments() async {
+    try {
+      QuerySnapshot snap = await FirebaseFirestore.instance
+          .collection('memories')
+          .doc(widget.snap['memoryId'])
+          .collection('comments')
+          .get();
+
+      commentLength = snap.docs.length;
+    } catch (e) {
+      showSnackbar(e.toString(), context);
+    }
+
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +96,11 @@ class _MemoryCardState extends State<MemoryCard> {
                           children: ["Delete"]
                               .map(
                                 (e) => InkWell(
-                                  onTap: () {},
+                                  onTap: () async {
+                                    await FirestoreMethods()
+                                        .deleteMemory(widget.snap['memoryId']);
+                                    Navigator.of(context).pop();
+                                  },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 12, horizontal: 16),
@@ -149,7 +178,9 @@ class _MemoryCardState extends State<MemoryCard> {
               IconButton(
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => CommentsScreen(),
+                    builder: (context) => CommentsScreen(
+                      snap: widget.snap,
+                    ),
                   ),
                 ),
                 icon: const Icon(
@@ -212,9 +243,10 @@ class _MemoryCardState extends State<MemoryCard> {
                   onTap: () {},
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: const Text(
-                      "View all 50 comments",
-                      style: TextStyle(fontSize: 16, color: secondaryColor),
+                    child: Text(
+                      "View all $commentLength comments",
+                      style:
+                          const TextStyle(fontSize: 16, color: secondaryColor),
                     ),
                   ),
                 ),
