@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 import 'package:socializz/models/user.dart';
+import 'package:socializz/screens/profile_screen.dart';
 import 'package:socializz/utils/colors.dart';
 
 import '../providers/user_provider.dart';
@@ -64,12 +65,22 @@ class _SearchScreenState extends State<SearchScreen> {
                   return ListView.builder(
                     itemCount: (snapshot.data! as dynamic).docs.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(user.photoUrl),
+                      return InkWell(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ProfileScreen(
+                              uid: (snapshot.data! as dynamic).docs[index]
+                                  ['uid'],
+                            ),
+                          ),
                         ),
-                        title: Text((snapshot.data! as dynamic).docs[index]
-                            ['username']),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(user.photoUrl),
+                          ),
+                          title: Text((snapshot.data! as dynamic).docs[index]
+                              ['username']),
+                        ),
                       );
                     },
                   );
