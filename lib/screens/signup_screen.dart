@@ -26,7 +26,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _aboutMeController = TextEditingController();
-  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   Uint8List? _image;
   bool _isLoading = false;
 
@@ -36,7 +36,7 @@ class _SignupScreenState extends State<SignupScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _aboutMeController.dispose();
-    _userNameController.dispose();
+    _usernameController.dispose();
   }
 
   void selectImage() async {
@@ -64,7 +64,7 @@ class _SignupScreenState extends State<SignupScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
         aboutMe: _aboutMeController.text.trim(),
-        userName: _userNameController.text.trim(),
+        username: _usernameController.text.trim(),
         file: _image!);
 
     setState(() {
@@ -145,7 +145,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 TextFieldInput(
                   icon: const Icon(Icons.person),
-                  textEditingController: _userNameController,
+                  textEditingController: _usernameController,
                   hintText: "Enter your username",
                   textInputType: TextInputType.text,
                 ),

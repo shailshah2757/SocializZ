@@ -23,7 +23,7 @@ class AuthMethods {
     required String email,
     required String password,
     required String aboutMe,
-    required String userName,
+    required String username,
     required Uint8List file,
     // required Uint8List file,
   }) async {
@@ -32,12 +32,12 @@ class AuthMethods {
     try {
       if (email.isNotEmpty ||
           password.isNotEmpty ||
-          userName.isNotEmpty ||
+          username.isNotEmpty ||
           aboutMe.isNotEmpty) {
         UserCredential userCredential = await _auth
             .createUserWithEmailAndPassword(email: email, password: password);
 
-        print(userCredential.user?.uid);
+        // print(userCredential.user?.uid);
 
         String photoUrl = await StorageMethods()
             .uploadImageToStorage('profilePics', file, false);
@@ -46,7 +46,7 @@ class AuthMethods {
             email: email,
             uid: userCredential.user!.uid,
             photoUrl: photoUrl,
-            username: userName,
+            username: username,
             aboutMe: aboutMe,
             friends: [],
             following: []);

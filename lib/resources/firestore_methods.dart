@@ -13,7 +13,7 @@ class FirestoreMethods {
     String res = "Some error occurred";
 
     try {
-      String photoUrl =
+      String memoryUrl =
           await StorageMethods().uploadImageToStorage('memories', file, true);
 
       String memoryId = const Uuid().v1();
@@ -21,7 +21,7 @@ class FirestoreMethods {
       Memory memory = Memory(
           description: description,
           uid: uid,
-          memoryUrl: photoUrl,
+          memoryUrl: memoryUrl,
           username: username,
           memoryId: memoryId,
           datePublished: DateTime.now(),

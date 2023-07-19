@@ -38,7 +38,7 @@ class Memory {
       description: snapshot['description'],
       uid: snapshot['uid'],
       memoryUrl: snapshot['memoryUrl'],
-      username: snapshot['username'] ?? 'shailshah',
+      username: snapshot['username'],
       // username: snapshot['username'],
       likes: snapshot['likes'],
       profileImage: snapshot['profileImage'],
