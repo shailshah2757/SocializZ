@@ -75,9 +75,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                         ),
                         child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(user.photoUrl),
-                          ),
+                          leading: const Icon(Icons.person),
                           title: Text((snapshot.data! as dynamic).docs[index]
                               ['username']),
                         ),

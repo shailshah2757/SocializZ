@@ -93,4 +93,43 @@ class FirestoreMethods {
       );
     }
   }
+
+  Future<void> friendUser(
+    String uid,
+    String friendId,
+  ) async {
+    try {
+      DocumentSnapshot snap =
+          await _firestore.collection('users').doc(uid).get();
+      List following = (snap.data()! as dynamic)['following'];
+
+      if (following.contains(friendId)) {
+        await _firestore.collection('users').doc(friendId).update(
+          {
+            'friends': FieldValue.arrayRemove([uid])
+          },
+        );
+
+        await _firestore.collection('users').doc(uid).update(
+          {
+            'following': FieldValue.arrayRemove([friendId])
+          },
+        );
+      } else {
+        await _firestore.collection('users').doc(friendId).update(
+          {
+            'friends': FieldValue.arrayUnion([uid])
+          },
+        );
+
+        await _firestore.collection('users').doc(uid).update(
+          {
+            'following': FieldValue.arrayUnion([friendId])
+          },
+        );
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }

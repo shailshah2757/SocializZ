@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:socializz/resources/auth_methods.dart';
+import 'package:socializz/resources/firestore_methods.dart';
+import 'package:socializz/screens/signin_screen.dart';
 import 'package:socializz/utils/colors.dart';
 import 'package:socializz/utils/utils.dart';
 
@@ -116,12 +119,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       FirebaseAuth.instance.currentUser!.uid ==
                                               widget.uid
                                           ? FollowButton(
-                                              text: "Edit Profile",
+                                              text: "Sign Out",
                                               backgroundColor:
                                                   mobileBackgroundColor,
                                               textColor: primaryColor,
                                               borderColor: Colors.grey,
-                                              function: () {},
+                                              function: () {
+                                                // await AuthMethods().signOut();
+                                                // Navigator.of(context)
+                                                //     .pushReplacement(
+                                                //   MaterialPageRoute(
+                                                //     builder: (context) =>
+                                                //         const SigninScreen(),
+                                                //   ),
+                                                // );
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return SimpleDialog(
+                                                        backgroundColor:
+                                                            primaryColor,
+                                                        title: const Text(
+                                                          "Do you want to logout?",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontFamily:
+                                                                  'Poppins'),
+                                                        ),
+                                                        children: [
+                                                          SimpleDialogOption(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(20),
+                                                            child: const Text(
+                                                              "Yes",
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  color: Colors
+                                                                      .black),
+                                                            ),
+                                                            onPressed:
+                                                                () async {
+                                                              await AuthMethods()
+                                                                  .signOut();
+                                                              // ignore: use_build_context_synchronously
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pushReplacement(
+                                                                MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          const SigninScreen(),
+                                                                ),
+                                                              );
+                                                            },
+                                                          ),
+                                                          SimpleDialogOption(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(20),
+                                                            child: const Text(
+                                                              "No",
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  color: Colors
+                                                                      .black),
+                                                            ),
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                          ),
+                                                        ],
+                                                      );
+                                                    });
+                                              },
                                             )
                                           : isFollowing
                                               ? FollowButton(
@@ -129,14 +205,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   backgroundColor: primaryColor,
                                                   textColor: Colors.black,
                                                   borderColor: Colors.grey,
-                                                  function: () {},
+                                                  function: () async {
+                                                    await FirestoreMethods()
+                                                        .friendUser(
+                                                            FirebaseAuth
+                                                                .instance
+                                                                .currentUser!
+                                                                .uid,
+                                                            userData['uid']);
+
+                                                    setState(() {
+                                                      isFollowing = false;
+                                                      friends--;
+                                                    });
+                                                  },
                                                 )
                                               : FollowButton(
                                                   text: "Friend",
                                                   backgroundColor: Colors.blue,
                                                   textColor: primaryColor,
                                                   borderColor: Colors.blue,
-                                                  function: () {},
+                                                  function: () async {
+                                                    await FirestoreMethods()
+                                                        .friendUser(
+                                                            FirebaseAuth
+                                                                .instance
+                                                                .currentUser!
+                                                                .uid,
+                                                            userData['uid']);
+
+                                                    setState(() {
+                                                      isFollowing = true;
+                                                      friends++;
+                                                    });
+                                                  },
                                                 )
                                     ],
                                   )

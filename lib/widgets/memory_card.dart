@@ -33,7 +33,23 @@ class _MemoryCardState extends State<MemoryCard> {
     getComments();
   }
 
-  void getComments() async {
+  // void getComments() async {
+  //   try {
+  //     QuerySnapshot snap = await FirebaseFirestore.instance
+  //         .collection('memories')
+  //         .doc(widget.snap['memoryId'])
+  //         .collection('comments')
+  //         .get();
+
+  //     commentLength = snap.docs.length;
+  //   } catch (e) {
+  //     showSnackbar(e.toString(), context);
+  //   }
+
+  //   setState(() {});
+  // }
+
+  getComments() async {
     try {
       QuerySnapshot snap = await FirebaseFirestore.instance
           .collection('memories')
@@ -43,10 +59,23 @@ class _MemoryCardState extends State<MemoryCard> {
 
       commentLength = snap.docs.length;
     } catch (e) {
-      showSnackbar(e.toString(), context);
+      showSnackBar(
+        context,
+        e.toString(),
+      );
     }
-
     setState(() {});
+  }
+
+  deleteMemory(String memoryId) async {
+    try {
+      await FirestoreMethods().deleteMemory(memoryId);
+    } catch (e) {
+      showSnackBar(
+        context,
+        e.toString(),
+      );
+    }
   }
 
   @override
@@ -85,36 +114,41 @@ class _MemoryCardState extends State<MemoryCard> {
                     ),
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => Dialog(
-                        child: ListView(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shrinkWrap: true,
-                          children: ["Delete"]
-                              .map(
-                                (e) => InkWell(
-                                  onTap: () async {
-                                    await FirestoreMethods()
-                                        .deleteMemory(widget.snap['memoryId']);
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12, horizontal: 16),
-                                    child: Text(e),
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.more_vert),
-                ),
+                widget.snap['uid'] == user.uid
+                    ? IconButton(
+                        onPressed: () {
+                          showDialog(
+                            useRootNavigator: false,
+                            context: context,
+                            builder: (context) => Dialog(
+                              child: ListView(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                shrinkWrap: true,
+                                children: ["Delete"]
+                                    .map(
+                                      (e) => InkWell(
+                                        onTap: () {
+                                          deleteMemory(
+                                            widget.snap['memoryId'].toString(),
+                                          );
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 12, horizontal: 16),
+                                          child: Text(e),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.more_vert),
+                      )
+                    : Container()
               ],
             ),
           ),
