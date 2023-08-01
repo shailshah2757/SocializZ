@@ -7,11 +7,13 @@ import 'package:socializz/screens/search_screen.dart';
 
 const webScreenSize = 600;
 
-var homeScreenItems = [
+List<Widget> homeScreenItems = [
   const FeedScreen(),
   const SearchScreen(),
   const AddPostScreen(),
-  const Text("notifications"),
+  const Center(
+    child: Text("Notifications Screen"),
+  ),
   ProfileScreen(
     uid: FirebaseAuth.instance.currentUser!.uid,
   ),

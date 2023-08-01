@@ -43,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       var memorySnap = await FirebaseFirestore.instance
           .collection('memories')
-          .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .where('uid', isEqualTo: widget.uid)
           .get();
 
       memoryLength = memorySnap.docs.length;
@@ -253,7 +253,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         padding: const EdgeInsets.only(top: 10, left: 5),
                         child: Text(
                           userData['username'].toString(),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -294,7 +294,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         DocumentSnapshot snap =
                             (snapshot.data! as dynamic).docs[index];
 
-                        return Container(
+                        return SizedBox(
                           child: Image(
                             image: NetworkImage(
                               snap['memoryUrl'],

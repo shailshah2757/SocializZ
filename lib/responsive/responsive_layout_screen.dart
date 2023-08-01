@@ -6,10 +6,11 @@ import 'package:socializz/utils/global_variables.dart';
 class ResponsiveLayout extends StatefulWidget {
   final Widget webScreenLayout;
   final Widget mobileScreenLayout;
-  const ResponsiveLayout(
-      {super.key,
-      required this.webScreenLayout,
-      required this.mobileScreenLayout});
+  const ResponsiveLayout({
+    super.key,
+    required this.webScreenLayout,
+    required this.mobileScreenLayout,
+  });
 
   @override
   State<ResponsiveLayout> createState() => _ResponsiveLayoutState();
@@ -23,8 +24,9 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
   }
 
   addData() async {
-    UserProvider _userProvider = Provider.of(context, listen: false);
-    await _userProvider.refreshUser();
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    await userProvider.refreshUser();
   }
 
   @override

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class CommentCard extends StatefulWidget {
+class CommentCard extends StatelessWidget {
   final snap;
   const CommentCard({
     super.key,
@@ -9,23 +9,18 @@ class CommentCard extends StatefulWidget {
   });
 
   @override
-  State<CommentCard> createState() => _CommentCardState();
-}
-
-class _CommentCardState extends State<CommentCard> {
-  @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundImage: NetworkImage(widget.snap['profilePic']),
+            backgroundImage: NetworkImage(snap.data()['profilePic']),
             radius: 18,
           ),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(
+              padding: const EdgeInsets.only(
                 left: 16,
               ),
               child: Column(
@@ -36,13 +31,13 @@ class _CommentCardState extends State<CommentCard> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: widget.snap['name'],
-                          style: TextStyle(
+                          text: snap.data()['name'],
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         TextSpan(
-                          text: " ${widget.snap['text']}",
+                          text: " ${snap.data()['text']}",
                         ),
                       ],
                     ),
@@ -51,7 +46,7 @@ class _CommentCardState extends State<CommentCard> {
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
                       DateFormat.yMMMEd()
-                          .format(widget.snap['datePublished'].toDate()),
+                          .format(snap.data()['datePublished'].toDate()),
                       style: const TextStyle(
                           fontSize: 12, fontWeight: FontWeight.w400),
                     ),

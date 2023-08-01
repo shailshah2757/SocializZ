@@ -19,11 +19,73 @@ class AddPostScreen extends StatefulWidget {
 class _AddPostScreenState extends State<AddPostScreen> {
   Uint8List? _file;
   final TextEditingController _descriptionController = TextEditingController();
-  bool _isLoading = false;
+  bool isLoading = false;
+
+  _selectImage(BuildContext parentContext) async {
+    return showDialog(
+      context: parentContext,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          backgroundColor: Colors.white,
+          title: const Text(
+            "Create a memory",
+            style: TextStyle(fontFamily: 'Poppins', color: Colors.black),
+          ),
+          children: <Widget>[
+            SimpleDialogOption(
+              padding: const EdgeInsets.all(20),
+              child: const Text(
+                "Click a photo",
+                style: TextStyle(fontFamily: 'Poppins', color: Colors.black),
+              ),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                Uint8List file = await pickImage(
+                  ImageSource.camera,
+                );
+                setState(() {
+                  _file = file;
+                });
+              },
+            ),
+            SimpleDialogOption(
+              padding: const EdgeInsets.all(20),
+              child: const Text(
+                "Choose from gallery",
+                style: TextStyle(fontFamily: 'Poppins', color: Colors.black),
+              ),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                Uint8List file = await pickImage(
+                  ImageSource.gallery,
+                );
+                setState(() {
+                  _file = file;
+                });
+              },
+            ),
+            SimpleDialogOption(
+              padding: const EdgeInsets.all(20),
+              child: const Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "Cancel",
+                  style: TextStyle(fontFamily: 'Poppins', color: Colors.red),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void addImage(String uid, String username, String profileImage) async {
     setState(() {
-      _isLoading = true;
+      isLoading = true;
     });
     try {
       String res = await FirestoreMethods().uploadMemories(
@@ -35,80 +97,29 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
       if (res == "Success") {
         setState(() {
-          _isLoading = false;
+          isLoading = false;
         });
-        showSnackbar('Posted!', context);
+        if (context.mounted) {
+          showSnackBar(
+            context,
+            "Posted!",
+          );
+        }
         clearImage();
       } else {
-        setState(() {
-          _isLoading = true;
-        });
-        showSnackbar(res, context);
+        if (context.mounted) {
+          showSnackBar(context, res);
+        }
       }
     } catch (e) {
-      showSnackbar(e.toString(), context);
+      setState(() {
+        isLoading = false;
+      });
+      showSnackBar(
+        context,
+        e.toString(),
+      );
     }
-  }
-
-  _selectImage(BuildContext context) async {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return SimpleDialog(
-            backgroundColor: Colors.white,
-            title: const Text(
-              "Create a memory",
-              style: TextStyle(fontFamily: 'Poppins', color: Colors.black),
-            ),
-            children: [
-              SimpleDialogOption(
-                padding: const EdgeInsets.all(20),
-                child: const Text(
-                  "Click a photo",
-                  style: TextStyle(fontFamily: 'Poppins', color: Colors.black),
-                ),
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  Uint8List file = await pickImage(
-                    ImageSource.camera,
-                  );
-                  setState(() {
-                    _file = file;
-                  });
-                },
-              ),
-              SimpleDialogOption(
-                padding: const EdgeInsets.all(20),
-                child: const Text(
-                  "Choose from gallery",
-                  style: TextStyle(fontFamily: 'Poppins', color: Colors.black),
-                ),
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  Uint8List file = await pickImage(
-                    ImageSource.gallery,
-                  );
-                  setState(() {
-                    _file = file;
-                  });
-                },
-              ),
-              SimpleDialogOption(
-                padding: const EdgeInsets.all(20),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(fontFamily: 'Poppins', color: Colors.red),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        });
   }
 
   void clearImage() {
@@ -162,8 +173,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
               ],
             ),
             body: Column(
-              children: [
-                _isLoading
+              children: <Widget>[
+                isLoading
                     ? const LinearProgressIndicator()
                     : const Padding(padding: EdgeInsets.only(top: 0)),
                 const Divider(),
@@ -178,7 +189,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: TextField(
                         controller: _descriptionController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                             hintText: 'Add a caption...',
                             border: InputBorder.none),
                         maxLines: 8,
@@ -200,9 +211,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
                         ),
                       ),
                     ),
-                    const Divider(),
                   ],
-                )
+                ),
+                const Divider(),
               ],
             ),
           );

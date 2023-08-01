@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:socializz/resources/auth_methods.dart';
 import 'package:socializz/screens/signup_screen.dart';
 import 'package:socializz/utils/colors.dart';
+import 'package:socializz/utils/global_variables.dart';
 import 'package:socializz/utils/utils.dart';
 import 'package:socializz/widgets/text_field_input.dart';
 
@@ -48,30 +49,39 @@ class _SigninScreenState extends State<SigninScreen> {
     );
 
     if (res == "Success") {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const ResponsiveLayout(
-            mobileScreenLayout: MobileScreenLayout(),
-            webScreenLayout: WebScreenLayout(),
-          ),
-        ),
-      );
-    } else {
-      showSnackbar(res, context);
-    }
+      if (context.mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (context) => const ResponsiveLayout(
+                    webScreenLayout: WebScreenLayout(),
+                    mobileScreenLayout: MobileScreenLayout())),
+            (route) => false);
 
-    setState(() {
-      _isLoading = false;
-    });
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+      if (context.mounted) {
+        showSnackBar(context, res);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        // resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
+            padding: MediaQuery.of(context).size.width > webScreenSize
+                ? EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width / 3)
+                : const EdgeInsets.symmetric(horizontal: 30),
             width: double.infinity,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -153,32 +163,34 @@ class _SigninScreenState extends State<SigninScreen> {
                           ),
                   ),
                 ),
-                const SizedBox(
-                  height: 170,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: const Text(
-                        "Don't have an account? ",
-                        style: TextStyle(fontFamily: 'Poppins'),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: navigateToSignup,
-                      child: Container(
+                SizedBox(height: MediaQuery.of(context).size.height * 0.13),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: const Text(
-                          "Sign Up",
-                          style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.bold),
+                          "Don't have an account? ",
+                          style: TextStyle(fontFamily: 'Poppins'),
                         ),
                       ),
-                    )
-                  ],
+                      GestureDetector(
+                        onTap: navigateToSignup,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: const Text(
+                            "Sign Up",
+                            style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 )
               ],
             ),

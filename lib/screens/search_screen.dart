@@ -1,12 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:provider/provider.dart';
-import 'package:socializz/models/user.dart';
 import 'package:socializz/screens/profile_screen.dart';
 import 'package:socializz/utils/colors.dart';
-
-import '../providers/user_provider.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -19,15 +15,15 @@ class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController searchController = TextEditingController();
   bool isShowUsers = false;
 
-  @override
-  void dispose() {
-    super.dispose();
-    searchController.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   searchController.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final User user = Provider.of<UserProvider>(context).getUser;
+    // final User user = Provider.of<UserProvider>(context).getUser;
 
     return Scaffold(
         appBar: AppBar(
@@ -75,7 +71,13 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                         ),
                         child: ListTile(
-                          leading: const Icon(Icons.person),
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              (snapshot.data! as dynamic).docs[index]
+                                  ['photoUrl'],
+                            ),
+                            radius: 16,
+                          ),
                           title: Text((snapshot.data! as dynamic).docs[index]
                               ['username']),
                         ),
@@ -85,20 +87,21 @@ class _SearchScreenState extends State<SearchScreen> {
                 },
               )
             : FutureBuilder(
-                future: FirebaseFirestore.instance.collection('memories').get(),
+                future: FirebaseFirestore.instance
+                    .collection('memories')
+                    .orderBy('datePublished')
+                    .get(),
                 builder: ((context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  return StaggeredGridView.countBuilder(
+                  return MasonryGridView.count(
                     crossAxisCount: 3,
                     itemCount: (snapshot.data! as dynamic).docs.length,
                     itemBuilder: (context, index) => Image.network(
-                        (snapshot.data! as dynamic).docs[index]['memoryUrl']),
-                    staggeredTileBuilder: (index) => StaggeredTile.count(
-                      (index % 7 == 0 ? 2 : 1),
-                      (index % 7 == 0 ? 2 : 1),
+                      (snapshot.data! as dynamic).docs[index]['memoryUrl'],
+                      fit: BoxFit.cover,
                     ),
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,

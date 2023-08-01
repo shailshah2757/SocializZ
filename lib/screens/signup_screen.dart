@@ -39,23 +39,6 @@ class _SignupScreenState extends State<SignupScreen> {
     _usernameController.dispose();
   }
 
-  void selectImage() async {
-    Uint8List? image = await pickImage(ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _image = image;
-      });
-    }
-  }
-
-  void navigateToSignin() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const SigninScreen(),
-      ),
-    );
-  }
-
   void signUpUser() async {
     setState(() {
       _isLoading = true;
@@ -67,28 +50,43 @@ class _SignupScreenState extends State<SignupScreen> {
         username: _usernameController.text.trim(),
         file: _image!);
 
-    setState(() {
-      _isLoading = false;
-    });
+    if (res == 'Success') {
+      setState(() {
+        _isLoading = false;
+      });
 
-    if (res != 'Success') {
-      showSnackbar(res, context);
-    } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const ResponsiveLayout(
-            mobileScreenLayout: MobileScreenLayout(),
-            webScreenLayout: WebScreenLayout(),
+      if (context.mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const ResponsiveLayout(
+              webScreenLayout: WebScreenLayout(),
+              mobileScreenLayout: MobileScreenLayout(),
+            ),
           ),
-        ),
-      );
+        );
+      }
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+      if (context.mounted) {
+        showSnackBar(context, res);
+      }
     }
+  }
+
+  selectImage() async {
+    Uint8List? image = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = image;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        // resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -239,7 +237,11 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: navigateToSignin,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const SigninScreen(),
+                          ),
+                        ),
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           child: const Text(

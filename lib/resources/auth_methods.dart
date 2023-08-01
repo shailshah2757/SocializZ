@@ -6,19 +6,22 @@ import 'package:flutter/foundation.dart';
 import 'package:socializz/models/user.dart' as model;
 import 'package:socializz/resources/storage_methods.dart';
 
+//it is used to handle the authentication
 class AuthMethods {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static FirebaseAuth _auth = FirebaseAuth.instance;
+  static FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  //retrieve the user details
   Future<model.User> getUserDetails() async {
     User currentUser = _auth.currentUser!;
 
-    DocumentSnapshot snap =
+    DocumentSnapshot documentSnapshot =
         await _firestore.collection('users').doc(currentUser.uid).get();
 
-    return model.User.fromSnap(snap);
+    return model.User.fromSnap(documentSnapshot);
   }
 
+  //for user registration
   Future<String> signUpUser({
     required String email,
     required String password,
@@ -33,23 +36,27 @@ class AuthMethods {
       if (email.isNotEmpty ||
           password.isNotEmpty ||
           username.isNotEmpty ||
-          aboutMe.isNotEmpty) {
+          aboutMe.isNotEmpty ||
+          // ignore: unnecessary_null_comparison
+          file != null) {
         UserCredential userCredential = await _auth
             .createUserWithEmailAndPassword(email: email, password: password);
 
         // print(userCredential.user?.uid);
 
+        //it is used to store the images in the firebase storage
         String photoUrl = await StorageMethods()
             .uploadImageToStorage('profilePics', file, false);
 
         model.User user = model.User(
-            email: email,
-            uid: userCredential.user!.uid,
-            photoUrl: photoUrl,
-            username: username,
-            aboutMe: aboutMe,
-            friends: [],
-            following: []);
+          email: email,
+          uid: userCredential.user!.uid,
+          photoUrl: photoUrl,
+          username: username,
+          aboutMe: aboutMe,
+          friends: [],
+          following: [],
+        );
 
         await _firestore
             .collection("users")
@@ -57,6 +64,8 @@ class AuthMethods {
             .set(user.toJson());
 
         res = "Success";
+      } else {
+        res = "Please enter the details";
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-email') {
@@ -79,7 +88,9 @@ class AuthMethods {
     try {
       if (email.isNotEmpty || password.isNotEmpty) {
         await _auth.signInWithEmailAndPassword(
-            email: email, password: password);
+          email: email,
+          password: password,
+        );
         res = "Success";
       } else {
         res = "Please enter all the details";
@@ -87,6 +98,8 @@ class AuthMethods {
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         res = "User not found";
+      } else if (e.code == 'uid-already-exists') {
+        res = "Username already exists";
       } else if (e.code == 'invalid-email') {
         res = "Email is not correctly formatted";
       } else if (e.code == 'invalid-password') {

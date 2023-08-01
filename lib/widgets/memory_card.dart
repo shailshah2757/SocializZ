@@ -7,10 +7,11 @@ import 'package:socializz/providers/user_provider.dart';
 import 'package:socializz/resources/firestore_methods.dart';
 import 'package:socializz/screens/comments_screen.dart';
 import 'package:socializz/utils/colors.dart';
+import 'package:socializz/utils/global_variables.dart';
 import 'package:socializz/utils/utils.dart';
 import 'package:socializz/widgets/like_animation.dart';
 
-import '../models/user.dart';
+import '../models/user.dart' as model;
 
 class MemoryCard extends StatefulWidget {
   final snap;
@@ -80,9 +81,16 @@ class _MemoryCardState extends State<MemoryCard> {
 
   @override
   Widget build(BuildContext context) {
-    final User user = Provider.of<UserProvider>(context).getUser;
+    final model.User user = Provider.of<UserProvider>(context).getUser;
+    final width = MediaQuery.of(context).size.width;
+
     return Container(
-      color: mobileBackgroundColor,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: width > webScreenSize ? secondaryColor : mobileBackgroundColor,
+        ),
+        color: mobileBackgroundColor,
+      ),
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
@@ -92,59 +100,63 @@ class _MemoryCardState extends State<MemoryCard> {
               horizontal: 16,
             ).copyWith(right: 0),
             child: Row(
-              children: [
+              children: <Widget>[
                 CircleAvatar(
                   radius: 16,
                   backgroundImage: NetworkImage(
-                    widget.snap['profileImage'],
+                    widget.snap['profileImage'].toString(),
                   ),
-                ),
+                ),  
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children: <Widget>[
                         Text(
-                          widget.snap['username'],
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          widget.snap['username'].toString(),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                   ),
                 ),
-                widget.snap['uid'] == user.uid
+                widget.snap['uid'].toString() == user.uid
                     ? IconButton(
                         onPressed: () {
                           showDialog(
-                            useRootNavigator: false,
-                            context: context,
-                            builder: (context) => Dialog(
-                              child: ListView(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                shrinkWrap: true,
-                                children: ["Delete"]
-                                    .map(
-                                      (e) => InkWell(
-                                        onTap: () {
-                                          deleteMemory(
-                                            widget.snap['memoryId'].toString(),
-                                          );
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12, horizontal: 16),
-                                          child: Text(e),
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
-                              ),
-                            ),
-                          );
+                              useRootNavigator: false,
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  child: ListView(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
+                                    shrinkWrap: true,
+                                    children: ["Delete"]
+                                        .map(
+                                          (e) => InkWell(
+                                            onTap: () {
+                                              deleteMemory(
+                                                widget.snap['memoryId']
+                                                    .toString(),
+                                              );
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12,
+                                                      horizontal: 16),
+                                              child: Text(e),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                );
+                              });
                         },
                         icon: const Icon(Icons.more_vert),
                       )
@@ -155,7 +167,9 @@ class _MemoryCardState extends State<MemoryCard> {
           GestureDetector(
             onDoubleTap: () async {
               await FirestoreMethods().likeMemory(
-                  widget.snap['memoryId'], user.uid, widget.snap['likes']);
+                  widget.snap['memoryId'].toString(),
+                  user.uid,
+                  widget.snap['likes']);
               setState(() {
                 isLikeAnimating = true;
               });
@@ -165,7 +179,7 @@ class _MemoryCardState extends State<MemoryCard> {
                 height: MediaQuery.of(context).size.height * 0.35,
                 width: double.infinity,
                 child: Image.network(
-                  widget.snap['memoryUrl'],
+                  widget.snap['memoryUrl'].toString(),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -192,15 +206,15 @@ class _MemoryCardState extends State<MemoryCard> {
             ]),
           ),
           Row(
-            children: [
+            children: <Widget>[
               LikeAnimation(
                 isAnimating: widget.snap['likes'].contains(user.uid),
                 smallLike: true,
                 child: IconButton(
-                  onPressed: () async {
-                    await FirestoreMethods().likeMemory(widget.snap['memoryId'],
-                        user.uid, widget.snap['likes']);
-                  },
+                  onPressed: () => FirestoreMethods().likeMemory(
+                      widget.snap['memoryId'].toString(),
+                      user.uid,
+                      widget.snap['likes']),
                   icon: widget.snap['likes'].contains(user.uid)
                       ? const Icon(
                           LineAwesomeIcons.heart_1,
@@ -213,7 +227,7 @@ class _MemoryCardState extends State<MemoryCard> {
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => CommentsScreen(
-                      snap: widget.snap,
+                      memoryId: widget.snap['memoryId'].toString(),
                     ),
                   ),
                 ),
@@ -243,7 +257,7 @@ class _MemoryCardState extends State<MemoryCard> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: <Widget>[
                 DefaultTextStyle(
                   style: Theme.of(context)
                       .textTheme
@@ -262,7 +276,7 @@ class _MemoryCardState extends State<MemoryCard> {
                         style: const TextStyle(color: primaryColor),
                         children: [
                           TextSpan(
-                            text: widget.snap['username'],
+                            text: widget.snap['username'].toString(),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
@@ -274,7 +288,13 @@ class _MemoryCardState extends State<MemoryCard> {
                   ),
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => CommentsScreen(
+                        memoryId: widget.snap['memoryId'].toString(),
+                      ),
+                    ),
+                  ),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Text(

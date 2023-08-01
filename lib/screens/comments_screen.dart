@@ -5,12 +5,13 @@ import 'package:socializz/models/user.dart';
 import 'package:socializz/providers/user_provider.dart';
 import 'package:socializz/resources/firestore_methods.dart';
 import 'package:socializz/utils/colors.dart';
+import 'package:socializz/utils/utils.dart';
 
 import '../widgets/comment_card.dart';
 
 class CommentsScreen extends StatefulWidget {
-  final snap;
-  const CommentsScreen({super.key, required this.snap});
+  final memoryId;
+  const CommentsScreen({super.key, required this.memoryId});
 
   @override
   State<CommentsScreen> createState() => _CommentsScreenState();
@@ -19,15 +20,36 @@ class CommentsScreen extends StatefulWidget {
 class _CommentsScreenState extends State<CommentsScreen> {
   final TextEditingController _commentController = TextEditingController();
 
-  @override
-  void dispose() {
-    super.dispose();
-    _commentController.dispose();
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   _commentController.dispose();
+  // }
+
+  void addComment(String uid, String name, String profilePic) async {
+    try {
+      String res = await FirestoreMethods().addComment(
+          widget.memoryId, _commentController.text, uid, name, profilePic);
+
+      if (res != "Success") {
+        if (context.mounted) {
+          showSnackBar(context, res);
+        }
+      }
+      setState(() {
+        _commentController.text = "";
+      });
+    } catch (e) {
+      showSnackBar(
+        context,
+        e.toString(),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final User user = Provider.of<UserProvider>(context).getUser;
+    final User? user = Provider.of<UserProvider>(context).getUser;
 
     return Scaffold(
       appBar: AppBar(
@@ -38,14 +60,15 @@ class _CommentsScreenState extends State<CommentsScreen> {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('memories')
-            .doc(widget.snap['memoryId'])
+            .doc(widget.memoryId)
             .collection('comments')
             .orderBy(
               'datePublished',
               descending: true,
             )
             .snapshots(),
-        builder: (context, snapshot) {
+        builder: (context,
+            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
@@ -53,9 +76,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
           }
 
           return ListView.builder(
-            itemCount: (snapshot.data! as dynamic).docs.length,
+            itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) => CommentCard(
-              snap: (snapshot.data! as dynamic).docs[index].data(),
+              snap: snapshot.data!.docs[index],
             ),
           );
         },
@@ -70,7 +93,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
             children: [
               CircleAvatar(
                 backgroundImage: NetworkImage(
-                  user.photoUrl,
+                  user!.photoUrl,
                 ),
                 radius: 18,
               ),
@@ -87,18 +110,11 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 ),
               ),
               InkWell(
-                onTap: () async {
-                  await FirestoreMethods().addComment(
-                    widget.snap['memoryId'],
-                    _commentController.text.trim(),
-                    user.uid,
-                    user.username,
-                    user.photoUrl,
-                  );
-                  setState(() {
-                    _commentController.text = "";
-                  });
-                },
+                onTap: () => addComment(
+                  user.uid,
+                  user.username,
+                  user.photoUrl,
+                ),
                 child: Container(
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
