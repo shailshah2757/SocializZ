@@ -10,7 +10,7 @@ class Memory {
   final String profileImage;
   final likes;
 
-  //Constructor calling 
+  //Constructor calling
   Memory(
       {required this.description,
       required this.uid,
@@ -21,9 +21,9 @@ class Memory {
       required this.profileImage,
       required this.likes});
 
-  //returns an instance of the Memory class 
+  //returns an instance of the Memory class
   static Memory fromSnap(DocumentSnapshot snap) {
-    var snapshot = snap.data() as Map;
+    var snapshot = snap.data() as Map<String, dynamic>;
 
     return Memory(
       description: snapshot["description"],
@@ -38,7 +38,7 @@ class Memory {
     );
   }
 
-  //Map<String, dynamic> maps a string key with the dynamic value 
+  //Map<String, dynamic> maps a string key with the dynamic value
   Map<String, dynamic> toJson() => {
         "description": description,
         "uid": uid,
